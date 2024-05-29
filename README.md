@@ -5,15 +5,15 @@ Instruction for building Hyprland on stable Debian
 
 ### Dependencies
 ```
-sudo apt install git make libssl-dev ninja-build pkg-config libgl1-mesa-dev libxkbcommon-dev uuid-dev libwayland-dev wayland-protocols libpango1.0-dev libpixman-1-dev libdrm-dev libinput-dev hwdata libseat-dev meson edid-decode libliftoff-dev libgbm-dev flex bison libzip-dev librsvg2-dev libtomlplusplus-dev libpugixml-dev xwayland libxcb-util-dev libxcb-xfixes0-dev libxcb-icccm4-dev libxcb-composite0-dev libxcb-res0-dev libxcb-ewmh-dev
+sudo apt install git make libssl-dev ninja-build pkg-config libgl1-mesa-dev libxkbcommon-dev uuid-dev libwayland-dev wayland-protocols libpango1.0-dev libpixman-1-dev libinput-dev hwdata libseat-dev meson edid-decode libliftoff-dev libgbm-dev flex bison libzip-dev librsvg2-dev libtomlplusplus-dev libpugixml-dev libxcb-util-dev libxcb-xfixes0-dev libxcb-icccm4-dev libxcb-composite0-dev libxcb-res0-dev libxcb-ewmh-dev libxml2-dev autoconf xutils-dev libtool
 ```
 
 #### CMake (>= 3.27)
 ```
-git clone https://github.com/Kitware/CMake.git
+git clone -b release --single-branch https://github.com/Kitware/CMake.git
 cd CMake
 mkdir build && cd build
-../bootstrap && make
+../bootstrap --prefix=/usr && make
 sudo make install
 ```
 
@@ -28,13 +28,13 @@ sudo ninja -C build/ install
 
 #### GCC (>= 13.1)
 ```
-git clone git://gcc.gnu.org/git/gcc.git
+git clone -b releases/gcc-14 --single-branch git://gcc.gnu.org/git/gcc.git
 cd gcc
-git switch releases/gcc-14
 bash contrib/download_prerequisites
 mkdir build && cd build
 ../configure --prefix=/usr --disable-multilib --enable-languages=c,c++ --enable-checking=release
 make && sudo make install
+sudo cp /usr/lib64/libstdc++.so.6 /usr/lib/x86_64-linux-gnu/libstdc++.so.6
 ```
 
 #### hyprlang (>= 0.3.2)
@@ -48,7 +48,11 @@ sudo cmake --install ./build
 
 #### libtomlplusplus-dev
 ```
-sudo wget https://raw.githubusercontent.com/marzer/tomlplusplus/master/toml.hpp -o /usr/include/toml++/toml.hpp
+git clone https://github.com/marzer/tomlplusplus.git
+cd tomlplusplus
+meson setup build/
+ninja -C build/
+sudo ninja -C build/ install
 ```
 
 #### hyprcursor (>= 0.1.7)
@@ -62,11 +66,25 @@ sudo cmake --install build
 
 #### hyprwayland-scanner (>= 0.3.8)
 ```
-https://github.com/hyprwm/hyprwayland-scanner.git
+git clone https://github.com/hyprwm/hyprwayland-scanner.git
 cd hyprwayland-scanner
 cmake -DCMAKE_INSTALL_PREFIX=/usr -B build
 cmake --build build -j `nproc`
 sudo cmake --install build
+```
+
+#### wayland
+```
+git clone https://gitlab.freedesktop.org/wayland/wayland
+cd wayland
+meson build/ --prefix=/usr -Ddocumentation=false
+```
+
+#### libdrm
+```
+git clone https://github.com/robherring/libdrm.git
+cd libdrm
+
 ```
 
 ### Build Hyprland
